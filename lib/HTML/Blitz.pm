@@ -316,7 +316,7 @@ my %_nop = (
     attrset => {
         type    => AT_AS_MODIFY_ATTRS,
         content => {},
-    }, 
+    },
     content => undef,
     repeat  => [],
 );
