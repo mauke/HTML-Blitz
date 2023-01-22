@@ -16,6 +16,11 @@ use HTML::Blitz::SelectorType qw(
     ST_ATTR_LANG_PREFIX
     ST_NTH_CHILD
     ST_NTH_CHILD_OF_TYPE
+
+    LT_DESCENDANT
+    LT_CHILD
+    LT_SIBLING
+    LT_ADJACENT_SIBLING
 );
 use HTML::Blitz::ActionType qw(
     AT_REMOVE_IF
@@ -137,6 +142,13 @@ my %attr_op_type = (
     '|' => ST_ATTR_LANG_PREFIX,
 );
 
+my %comb_type = (
+    ' ' => LT_DESCENDANT,
+    '>' => LT_CHILD,
+    '~' => LT_SIBLING,
+    '+' => LT_ADJACENT_SIBLING,
+);
+
 fun _try_parse_simple_selector($src_ref, :$allow_tag_name) {
     if ($allow_tag_name && $$src_ref =~ /\G(\*|$ident)/gc) {
         return { type => ST_TAG_NAME, name => _css_unescape($1) };
@@ -244,8 +256,10 @@ fun _try_parse_simple_selector($src_ref, :$allow_tag_name) {
 
 fun _parse_selector($src) {
     croak "Invalid selector: $src" if ref $src;
-    my @sequences;
-    my @simples;
+
+    my @alternatives;
+    my $sequences = [];
+    my $simples = [];
 
     pos($src) = 0;
     $src =~ /\G$ws++/gc;
@@ -260,14 +274,28 @@ fun _parse_selector($src) {
             $src =~ /\G\)/gc
                 or croak "Missing ')' after argument to ':not(': " . substr($src, pos($src), 100);
             $simple->{negated} = 1;
-            push @simples, $simple;
-        } elsif (defined(my $simple = _try_parse_simple_selector \$src, allow_tag_name => !@simples)) {
-            push @simples, $simple;
+            push @$simples, $simple;
+        } elsif (defined(my $simple = _try_parse_simple_selector \$src, allow_tag_name => !@$simples)) {
+            push @$simples, $simple;
+        } elsif ($src =~ /\G(?>$ws*([>~+])|$ws)$ws*+/gc) {
+            my $comb = $1 // ' ';
+            @$simples
+                or croak "Selector list before '$comb' cannot be empty: " . substr($src, $-[0], 100);
+            push @$sequences, HTML::Blitz::SSSelector->new(
+                simple_selectors => $simples,
+                link_type        => $comb_type{$comb},
+            );
+            $simples = [];
         } elsif ($src =~ /\G,$ws*+/gc) {
-            @simples
+            @$simples
                 or croak "Selector list before ',' cannot be empty: " . substr($src, $-[0], 100);
-            push @sequences, HTML::Blitz::SSSelector->new(@simples);
-            @simples = ();
+            push @$sequences, HTML::Blitz::SSSelector->new(
+                simple_selectors => $simples,
+                link_type        => undef,
+            );
+            $simples = [];
+            push @alternatives, $sequences;
+            $sequences = [];
         } else {
             last;
         }
@@ -275,12 +303,18 @@ fun _parse_selector($src) {
 
     $src =~ /\G$ws*+\z/
         or croak "Unparsable selector: " . substr($src, pos($src), 100);
-    @simples
-        or croak @sequences ? "Trailing comma after last selector list" : "Selector cannot be empty";
+    @$simples
+        or croak
+            @$sequences ? "Trailing combinator after last selector list" :
+            @alternatives ? "trailing comma after last selector list" :
+            "Selector cannot be empty";
 
-    push @sequences, HTML::Blitz::SSSelector->new(@simples);
-
-    HTML::Blitz::SelectorGroup->new(@sequences)
+    push @$sequences, HTML::Blitz::SSSelector->new(
+        simple_selectors => $simples,
+        link_type        => undef,
+    );
+    push @alternatives, $sequences;
+    \@alternatives
 }
 
 fun _text($str) {
