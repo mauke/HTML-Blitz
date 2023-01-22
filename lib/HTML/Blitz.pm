@@ -1702,6 +1702,17 @@ follow slightly different rules:
     <!-- this is a syntax error: attempt to self-close a non-void tag outside of svg/math -->
     <circle />
 
+Similarly, within C<math> and C<svg> elements you can use C<CDATA> blocks with
+raw text inside:
+
+    <math>
+        <!-- OK: equivalent to "a&lt;b&amp;b&lt;c" -->
+        <![CDATA[a<b&b<c]]>
+    </math>
+
+    <!-- syntax error: CDATA outside of math/svg -->
+    <![CDATA[...]]>
+
 The (utterly bonkers) special parsing rules for C<script> elements are
 faithfully implemented:
 
