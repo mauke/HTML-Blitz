@@ -736,6 +736,8 @@ HTML::Blitz - high-performance, selector-based, content-aware HTML template engi
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
     use HTML::Blitz ();
     my $blitz = HTML::Blitz->new;
 
@@ -883,9 +885,13 @@ second phase, all matching actions are applied.
 
 Consider the following document fragment:
 
+=for highlighter language=html
+
     <div class="foo"> ... </div>
 
 And these rules:
+
+=for highlighter language=perl
 
     [ 'div' => ['remove_all_attributes'] ],
     [ '.foo' => ['replace_inner_text', 'Hello!'] ],
@@ -896,6 +902,8 @@ these rules: Both selectors are matched first, and then both actions are
 applied together. The attribute removal does not prevent the second rule from
 matching. The result will always come out as:
 
+=for highlighter language=html
+
     <div>Hello!</div>
 
 In cases where multiple actions apply to the same element, all actions are run,
@@ -905,12 +913,16 @@ but their order is unspecified. Consider the following document fragment:
 
 And these rules:
 
+=for highlighter language=perl
+
     [ 'div' => ['replace_inner_text', 'A'], ['replace_inner_text', 'B'] ],
     [ '.foo' => ['replace_inner_text', 'B'] ],
 
 All three actions will run and replace the contents of the C<div> element, but
 since their order is unspecified, you may end up with any of the following
 three results (depending on which action runs last):
+
+=for highlighter language=html
 
     <div class="foo">A</div>
 
@@ -934,6 +946,8 @@ document fragment:
 
 And these actions:
 
+=for highlighter language=perl
+
     ['remove_all_attributes'],                                          #1
     ['set_attribute_text', src => 'kitten.jpg'],                        #2
     ['set_attribute_text', alt => "Photo of a sleeping kitten"],        #3
@@ -943,6 +957,8 @@ Clearly the most sensible way to arrange these actions is from #1 to #4; first
 removing all existing attributes, giving C<< <img> >>, then gradually setting
 new attributes, giving C<< <img src="kitten.jpg" alt="Photo of a sleeping kitten"> >>,
 and finally transforming them. This would result in:
+
+=for highlighter language=html
 
     <img src="/media/images/kitten.jpg" alt="Photo of a sleeping kitten">
 
@@ -964,6 +980,8 @@ And that's what HTML::Blitz actually does.
 =head1 METHODS
 
 =head2 new
+
+=for highlighter language=perl
 
     my $blitz = HTML::Blitz->new;
     my $blitz = HTML::Blitz->new(\%options);
@@ -1202,6 +1220,8 @@ omitted unless the C<An> part is also gone; C<n> can also be written C<N>.
 
 In short, all of these are valid arguments to C<:nth-child>:
 
+=for highlighter language=css
+
     3n+1
     3n-2
     -4n+7
@@ -1370,6 +1390,8 @@ value as a string, or the string C<var>, in which case the second element is a
 variable name and the attribute value is substituted in at runtime.
 
 For example:
+
+=for highlighter language=perl
 
     ['replace_all_attributes', {
         class => [text => 'button cta-1'],
@@ -1614,6 +1636,8 @@ matched element is the first child of the parent whose contents are repeated.
 
 For example, consider the following template code:
 
+=for highlighter language=html
+
     <div id="list">
         <hr class="sep">
         <p class="c1">other stuff</p>
@@ -1621,6 +1645,8 @@ For example, consider the following template code:
     </div>
 
 ... with this set of rules:
+
+=for highlighter language=perl
 
     ['#list' =>
         ['repeat_inner', 'things',
@@ -1634,6 +1660,8 @@ Since the C<hr> element targeted by the C<separator> action occurs at the
 beginning of the section, it acts as a separator: It will not appear in the
 first copy of the section, but every following copy will include it. The
 result will look Like this:
+
+=for highlighter language=html
 
     <div id="list">
         
@@ -1654,6 +1682,8 @@ result will look Like this:
 
 =head2 apply_to_html
 
+=for highlighter language=perl
+
     my $template = $blitz->apply_to_html($name, $html_code);
 
 Applies the processing rules (added in L<the constructor|/new> or via
@@ -1665,6 +1695,8 @@ returned value is an instance of L<HTML::Blitz::Template>, which see.
 There are some restrictions on the HTML code you can pass in. This module does
 not implement the full HTML specification; in particular, implicit tags of any
 kind are not supported. For example, the following fragment is valid HTML:
+
+=for highlighter language=html
 
     <div>
         <p> A
@@ -1780,6 +1812,8 @@ Attributes without values are allowed (and implicitly assigned the empty string 
 
 =head2 apply_to_file
 
+=for highlighter language=perl
+
     my $template = $blitz->apply_to_file($filename);
 
 A convenience wrapper around L</apply_to_html>. It reads the contents of
@@ -1846,6 +1880,8 @@ The following is a complete program:
     print $html;
 
 It produces the following output:
+
+=for highlighter language=html
 
     <!DOCTYPE html>
     <html lang=en>
@@ -2010,7 +2046,7 @@ Lukas Mai, C<< <lmai at web.de> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2022 Lukas Mai.
+Copyright 2022-2023 Lukas Mai.
 
 This module is free software: you can redistribute it and/or modify it under
 the terms of the L<GNU Affero General Public License|https://www.gnu.org/licenses/agpl-3.0.txt>
