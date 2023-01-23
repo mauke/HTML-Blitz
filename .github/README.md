@@ -346,18 +346,28 @@ A _rule_ is an array reference whose first element is a selector and whose
 remaining elements are processing actions. The actions will be applied to all
 HTML elements in the template document that match the selector.
 
-A _selector_ is a CSS selector in the form of a string.
+A _selector_ is a CSS selector group in the form of a string.
 
 An _action_ is an array reference whose first element is a string that
 specifies the type of the action; the remaining elements are arguments.
 Different types of actions take different kinds of arguments.
 
-In the current implementation, only a subset of the full CSS selector
-specification is supported. In particular, anything involving selector
-combinators (i.e. `S1 S2`, `S1 > S2`, `S1 ~ S2`, or `S1 + S2`) is not
-implemented. A supported selector is a comma-separated list of one or more
-simple selector sequences. It matches any element matched by any of the
-sequences in the list.
+A selector group is a comma-separated list of one or more selectors. It matches
+any element matched by any of the selectors in the list.
+
+A selector is one or more simple selector sequences separated by a combinator.
+
+The available combinators are whitespace, `>`, `~`, and `+`. For all
+simple selector sequences _S1_, _S2_:
+
+- The descendant combinator `S1 S2` matches any element _S2_ that has an
+ancestor matching _S1_.
+- The child combinator `S1 > S2` matches any element _S2_ that has an
+immediate parent element matching _S1_.
+- The sibling combinator `S1 ~ S2` matches any element _S2_ that has a
+preceding sibling element matching _S1_.
+- The adjacent sibling combinator `S1 + S2` matches any element _S2_ that has
+an immediately preceding sibling element matching _S1_.
 
 A simple selector sequence is a sequence of one or more simple selectors
 separated by nothing (not even whitespace). If a universal or type selector is
