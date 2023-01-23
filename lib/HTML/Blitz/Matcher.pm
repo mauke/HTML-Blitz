@@ -7,6 +7,8 @@ use HTML::Blitz::pragma;
 use HTML::Blitz::SelectorType qw(LT_DESCENDANT LT_CHILD LT_SIBLING LT_ADJACENT_SIBLING);
 use Scalar::Util ();
 
+our $VERSION = '0.03';
+
 method new($class: $rules) {
     bless {
         slices    => [

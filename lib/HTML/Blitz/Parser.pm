@@ -13,6 +13,8 @@ use HTML::Blitz::TokenType qw(
     TT_DOCTYPE
 );
 
+our $VERSION = '0.03';
+
 method _fail(
     $msg,
     :$pos       = pos(${$self->{src_ref}}),
