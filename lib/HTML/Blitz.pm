@@ -1109,18 +1109,43 @@ A I<rule> is an array reference whose first element is a selector and whose
 remaining elements are processing actions. The actions will be applied to all
 HTML elements in the template document that match the selector.
 
-A I<selector> is a CSS selector in the form of a string.
+A I<selector> is a CSS selector group in the form of a string.
 
 An I<action> is an array reference whose first element is a string that
 specifies the type of the action; the remaining elements are arguments.
 Different types of actions take different kinds of arguments.
 
-In the current implementation, only a subset of the full CSS selector
-specification is supported. In particular, anything involving selector
-combinators (i.e. C<S1 S2>, C<< S1 > S2 >>, C<S1 ~ S2>, or C<S1 + S2>) is not
-implemented. A supported selector is a comma-separated list of one or more
-simple selector sequences. It matches any element matched by any of the
-sequences in the list.
+A selector group is a comma-separated list of one or more selectors. It matches
+any element matched by any of the selectors in the list.
+
+A selector is one or more simple selector sequences separated by a combinator.
+
+The available combinators are whitespace, C<< > >>, C<~>, and C<+>. For all
+simple selector sequences I<S1>, I<S2>:
+
+=over
+
+=item *
+
+The descendant combinator C<S1 S2> matches any element I<S2> that has an
+ancestor matching I<S1>.
+
+=item *
+
+The child combinator C<< S1 > S2 >> matches any element I<S2> that has an
+immediate parent element matching I<S1>.
+
+=item *
+
+The sibling combinator C<S1 ~ S2> matches any element I<S2> that has a
+preceding sibling element matching I<S1>.
+
+=item *
+
+The adjacent sibling combinator C<S1 + S2> matches any element I<S2> that has
+an immediately preceding sibling element matching I<S1>.
+
+=back
 
 A simple selector sequence is a sequence of one or more simple selectors
 separated by nothing (not even whitespace). If a universal or type selector is
