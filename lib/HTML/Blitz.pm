@@ -3,7 +3,6 @@ use HTML::Blitz::pragma;
 use HTML::Blitz::Template ();
 use HTML::Blitz::RuleSet ();
 use HTML::Blitz::SSSelector ();
-use HTML::Blitz::SelectorGroup ();
 use HTML::Blitz::SelectorType qw(
     ST_FALSE
     ST_TAG_NAME
