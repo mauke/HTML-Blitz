@@ -97,7 +97,7 @@ fun _css_unescape_string($str) {
         $str =~ s/'\z// or die "Internal error: unterminated ' string";
     }
     $str =~ s{
-        \\ (
+        \\ (?:
             ( [[:xdigit:]]{1,6} ) (?: \r\n | [ \t\r\n\f] )?+
         |
             ( [^\n\r\f[:xdigit:]] )
