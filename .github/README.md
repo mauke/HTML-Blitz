@@ -369,6 +369,14 @@ preceding sibling element matching _S1_.
 - The adjacent sibling combinator `S1 + S2` matches any element _S2_ that has
 an immediately preceding sibling element matching _S1_.
 
+**Limitation:** In the current implementation, the number of adjacent
+non-descendant combinators is limited by the number of bits that perl uses for
+integers. That is, you cannot use more than 32 (if your perl uses 32-bit
+integers) or 64 (if your perl uses 64-bit integers) simple selector sequences
+in a row if they are all joined using `>`, `~`, or `+`. (No limit is
+placed on the number of simple selectors in a sequence, nor on simple selector
+sequences joined using the descendant combinator (whitespace).)
+
 A simple selector sequence is a sequence of one or more simple selectors
 separated by nothing (not even whitespace). If a universal or type selector is
 present, it must come first in the sequence. A sequence matches any element
