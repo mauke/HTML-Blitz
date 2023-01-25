@@ -173,6 +173,7 @@ fun _try_parse_simple_selector($src_ref, :$allow_tag_name) {
         }xgc
     ) {
         my ($attr, $op, $val_ident, $val_string) = ($1, $2, $3, $4);
+        $attr = _css_unescape $attr;
         $attr =~ tr/A-Z/a-z/;
         if (!defined $op) {
             return { type => ST_ATTR_HAS, attr => $attr };
