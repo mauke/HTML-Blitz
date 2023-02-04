@@ -109,6 +109,10 @@ my %void_tags = map +($_ => 1), qw(
     source
     track
     wbr
+
+    basefont bgsound
+    frame
+    keygen
 );
 
 my %foreign_tags = map +($_ => 1), qw(
