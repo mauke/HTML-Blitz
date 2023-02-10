@@ -23,6 +23,8 @@ t/marshal.t
 t/methods.t
 t/selector-combinators.t
 t/selectors.t
+t/special.t
 t/template/doc.html
+t/void.t
 t/xmlish.t
 xt/pod.t

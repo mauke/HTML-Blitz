@@ -1,3 +1,12 @@
+0.05 2023-02-11
+    - fatalize 'uninitialized' warnings; i.e. templates will now die() if they
+      encounter undefined variables
+    - treat basefont, bgsound, frame, keygen as void elements; i.e. they cannot
+      have content or close tags
+    - special-case the contents of script, style, and title elements; they
+      cannot have child elements and (in the case of style and script) they
+      don't support HTML entities to escape text contents
+
 0.04 2023-01-25
     - selectors: fix parsing of escape sequences in attribute names
       (e.g. `[foo\00002dbar="baz"]`)
