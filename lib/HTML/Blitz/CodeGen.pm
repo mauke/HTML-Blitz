@@ -583,7 +583,7 @@ method assemble(:$data_format, :$data_format_mapping) {
 
     my $gen_code = $do_assemble->([undef, ''], $self->scope, $self->{code});
 
-    "use strict; use warnings;\n"
+    "use strict; use warnings 'all', FATAL => 'uninitialized';\n"
     . ($need_err_callable || $need_assert_script || $need_assert_style
         ? "use Carp ();\n"
         : ''
