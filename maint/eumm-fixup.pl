@@ -12,7 +12,7 @@ sub MY::postamble {
 sub {
     my ($opt) = @_;
 
-    $opt->{depend}{Makefile} .= ' ' . __FILE__;
+    $opt->{depend}{Makefile} .= ' $(VERSION_FROM) ' . __FILE__;
 
     $opt->{test}{TESTS} .= ' ' . find_tests_recursively_in 'xt';
 
