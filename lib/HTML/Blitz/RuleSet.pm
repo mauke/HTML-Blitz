@@ -35,7 +35,7 @@ use HTML::Blitz::ActionType qw(
 );
 use List::Util qw(all reduce);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 method new($class:) {
     bless {

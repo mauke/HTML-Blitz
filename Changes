@@ -1,3 +1,10 @@
+0.06 2023-02-19
+    - allow <math/> and <svg/> (i.e. math and svg elements can be self-closing)
+    - treat param as void in the parser
+    - treat basefont, bgsound, frage, keygen, parser as void in HTML::Blitz::Builder
+    - include the name of the template in the generated code so error messages
+      don't just refer to "(eval 42)"
+
 0.05 2023-02-11
     - fatalize 'uninitialized' warnings; i.e. templates will now die() if they
       encounter undefined variables
