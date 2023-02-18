@@ -28,8 +28,9 @@ use constant {
 
 our $VERSION = '0.05';
 
-method new($class: :$_scope = 0) {
+method new($class: :$_scope = 0, :$name = undef) {
     bless {
+        name  => defined($name) ? "$name" : undef,
         depth => $_scope,
         code  => [
             { type => OP_RAW, str => '' },
@@ -53,7 +54,7 @@ method FREEZE($model) {
             }
         }
     }
-    _REPR_VERSION, [$self->{depth}, \@code]
+    _REPR_VERSION, [$self->{depth}, \@code, $self->{name}]
 }
 
 method THAW($class: $model, $repr_version, $components) {
@@ -61,16 +62,16 @@ method THAW($class: $model, $repr_version, $components) {
         or croak "Cannot deserialize data format $repr_version with $class v$VERSION, which only supports data format " . _REPR_VERSION;
     my @todo = ['init', \my $self, @$components];
     while (@todo) {
-        my ($type, $ref, $depth, $code) = @{pop @todo};
+        my ($type, $ref, $depth, $code, $name) = @{pop @todo};
         if ($type eq 'exit') {
-            my $obj = $class->new(_scope => $depth);
+            my $obj = $class->new(_scope => $depth, name => $name);
             $obj->{code} = $code;
             $$ref = $obj;
             next;
         }
         $type eq 'init'
             or die "Internal error: bad THAW stack type '$type'";
-        push @todo, ['exit', $ref, $depth, $code];
+        push @todo, ['exit', $ref, $depth, $code, $name];
         for my $op (@$code) {
             if ($op->{type} eq OP_LOOP || $op->{type} eq OP_COND) {
                 if ($model eq 'JSON' && $op->{type} eq OP_COND) {
@@ -294,7 +295,7 @@ method rescoped_onto($scope) {
             die "Internal error: unknown op type $op->{type}";
         }
     }
-    my $new = ref($self)->new(_scope => $scope);
+    my $new = ref($self)->new(_scope => $scope, name => $self->{name});
     $new->{code} = \@code;
     $new
 }
@@ -583,7 +584,11 @@ method assemble(:$data_format, :$data_format_mapping) {
 
     my $gen_code = $do_assemble->([undef, ''], $self->scope, $self->{code});
 
-    "use strict; use warnings 'all', FATAL => 'uninitialized';\n"
+    (defined $self->{name}
+        ? '#line 1 "(blitz-template)' . $self->{name} =~ tr/"\n\r/_/r . qq{"\n}
+        : ''
+    )
+    . "use strict; use warnings 'all', FATAL => 'uninitialized';\n"
     . ($need_err_callable || $need_assert_script || $need_assert_style
         ? "use Carp ();\n"
         : ''

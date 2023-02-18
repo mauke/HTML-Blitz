@@ -379,7 +379,7 @@ fun _with_stopper($alternatives, $result) {
 }
 
 method compile($name, $html) {
-    my $codegen = HTML::Blitz::CodeGen->new;
+    my $codegen = HTML::Blitz::CodeGen->new(name => $name);
     my $matcher = HTML::Blitz::Matcher->new([
         map _with_stopper($_->{selector}, _bind_scope($codegen->scope, $_->{result})),
             @{$self->{rules}}
