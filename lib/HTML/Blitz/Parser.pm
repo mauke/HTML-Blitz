@@ -113,6 +113,7 @@ my %void_tags = map +($_ => 1), qw(
     basefont bgsound
     frame
     keygen
+    param
 );
 
 my %foreign_tags = map +($_ => 1), qw(

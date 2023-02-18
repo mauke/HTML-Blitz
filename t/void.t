@@ -18,6 +18,7 @@ my $html = <<'_EOT_';
     <keygen>
     <link>
     <meta>
+    <param>
     <source>
     <track>
     <wbr>
