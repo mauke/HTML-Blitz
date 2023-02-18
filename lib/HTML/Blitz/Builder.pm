@@ -71,13 +71,16 @@ fun _mk_attr($name, $value) {
 
 my %is_void = map +($_ => 1), qw(
     area
-    base br
+    base basefont bgsound br
     col
     embed
+    frame
     hr
     img input
+    keygen
     link
     meta
+    param
     source
     track
     wbr
