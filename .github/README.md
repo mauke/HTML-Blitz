@@ -1242,30 +1242,38 @@ consisting only of string constants, variables, calls to `encode_entities`
 hard-coded; nothing was modularized or factored out into subroutines.
 
 Against this, I timed a few template systems ([HTML::Blitz](https://metacpan.org/pod/HTML%3A%3ABlitz), [HTML::Zoom](https://metacpan.org/pod/HTML%3A%3AZoom),
-[Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit)) as well as [HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder), which is rather the
-opposite of a template system.
+[Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit), [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate), [HTML::Template::Pro](https://metacpan.org/pod/HTML%3A%3ATemplate%3A%3APro)) as well as
+[HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder), which is rather the opposite of a template system.
 
 Results:
 
 - baseline
 
-    457/s (0.0022s per iteration), 100% (of baseline performance, the theoretical maximum)
+    402/s (0.0025s per iteration), 100% (of baseline performance, the theoretical maximum)
 
-- HTML::Blitz
+- HTML::Blitz 0.06
 
-    392/s (0.0026s per iteration), 85.8%
+    353/s (0.0028s per iteration), 87.8%
 
-- Template::Toolkit
+- HTML::Template::Pro 0.9524
 
-    48.0/s (0.0208s per iteration), 10.5%
+    328/s (0.0030s per iteration), 81.6%
 
-- HTML::Blitz::Builder
+- Template::Toolkit 3.101
 
-    40.8/s (0.0245s per iteration), 8.9%
+    42.0/s (0.0238s per iteration), 10.4%
 
-- HTML::Zoom
+- HTML::Blitz::Builder 0.06
 
-    1.39/s (0.7194s per iteration), 0.3%
+    35.7/s (0.0280s per iteration), 8.9%
+
+- HTML::Template 2.97
+
+    34.2/s (0.0292s per iteration), 8.5%
+
+- HTML::Zoom 0.009009
+
+    1.23/s (0.8130s per iteration), 0.3%
 
 Conclusions:
 
@@ -1276,6 +1284,8 @@ a noticeable impact on performance.
 20 milliseconds to zip through would lock up [HTML::Zoom](https://metacpan.org/pod/HTML%3A%3AZoom) for over 5 seconds.
 - HTML::Blitz is competitive with hand-written code that sacrifices all semblance
 of maintainability for speed. In fact, it still runs at 80%-90% of that speed.
+- HTML::Blitz can, depending on your workload, run faster than
+[HTML::Template::Pro](https://metacpan.org/pod/HTML%3A%3ATemplate%3A%3APro), which is written in C for speed.
 
 # WHY THE NAME
 

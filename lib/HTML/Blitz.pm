@@ -1996,8 +1996,8 @@ consisting only of string constants, variables, calls to C<encode_entities>
 hard-coded; nothing was modularized or factored out into subroutines.
 
 Against this, I timed a few template systems (L<HTML::Blitz>, L<HTML::Zoom>,
-L<Template::Toolkit>) as well as L<HTML::Blitz::Builder>, which is rather the
-opposite of a template system.
+L<Template::Toolkit>, L<HTML::Template>, L<HTML::Template::Pro>) as well as
+L<HTML::Blitz::Builder>, which is rather the opposite of a template system.
 
 Results:
 
@@ -2005,23 +2005,31 @@ Results:
 
 =item baseline
 
-457/s (0.0022s per iteration), 100% (of baseline performance, the theoretical maximum)
+402/s (0.0025s per iteration), 100% (of baseline performance, the theoretical maximum)
 
-=item HTML::Blitz
+=item HTML::Blitz 0.06
 
-392/s (0.0026s per iteration), 85.8%
+353/s (0.0028s per iteration), 87.8%
 
-=item Template::Toolkit
+=item HTML::Template::Pro 0.9524
 
-48.0/s (0.0208s per iteration), 10.5%
+328/s (0.0030s per iteration), 81.6%
 
-=item HTML::Blitz::Builder
+=item Template::Toolkit 3.101
 
-40.8/s (0.0245s per iteration), 8.9%
+42.0/s (0.0238s per iteration), 10.4%
 
-=item HTML::Zoom
+=item HTML::Blitz::Builder 0.06
 
-1.39/s (0.7194s per iteration), 0.3%
+35.7/s (0.0280s per iteration), 8.9%
+
+=item HTML::Template 2.97
+
+34.2/s (0.0292s per iteration), 8.5%
+
+=item HTML::Zoom 0.009009
+
+1.23/s (0.8130s per iteration), 0.3%
 
 =back
 
@@ -2044,6 +2052,11 @@ L<HTML::Zoom> by a factor of 200 or 300. A dataset that might take HTML::Blitz
 
 HTML::Blitz is competitive with hand-written code that sacrifices all semblance
 of maintainability for speed. In fact, it still runs at 80%-90% of that speed.
+
+=item *
+
+HTML::Blitz can, depending on your workload, run faster than
+L<HTML::Template::Pro>, which is written in C for speed.
 
 =back
 
