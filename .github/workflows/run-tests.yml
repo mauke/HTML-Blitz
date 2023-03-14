@@ -29,6 +29,9 @@ jobs:
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl-version }}
-      - run: perl Makefile.PL
       - run: cpanm --installdeps --with-develop --notest .
-      - run: make test
+      - run: cpanm --notest Devel::Cover::Report::Coveralls
+      - run: perl Makefile.PL
+      - run: cover -test -report Coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
