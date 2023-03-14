@@ -734,6 +734,8 @@ __END__
 
 HTML::Blitz - high-performance, selector-based, content-aware HTML template engine
 
+=for markdown [![Coverage Status](https://coveralls.io/repos/github/mauke/HTML-Blitz/badge.svg?branch=main)](https://coveralls.io/github/mauke/HTML-Blitz?branch=main)
+
 =head1 SYNOPSIS
 
 =for highlighter language=perl

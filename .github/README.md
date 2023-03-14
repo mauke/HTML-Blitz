@@ -2,6 +2,8 @@
 
 HTML::Blitz - high-performance, selector-based, content-aware HTML template engine
 
+[![Coverage Status](https://coveralls.io/repos/github/mauke/HTML-Blitz/badge.svg?branch=main)](https://coveralls.io/github/mauke/HTML-Blitz?branch=main)
+
 # SYNOPSIS
 
 ```perl
