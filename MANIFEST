@@ -24,6 +24,7 @@ simple-benchmark/bench.tmpl
 simple-benchmark/bench.tt
 simple-benchmark/bench.tx
 t/actions.t
+t/builder.t
 t/errors.t
 t/marshal.t
 t/methods.t
