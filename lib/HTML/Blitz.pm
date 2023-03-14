@@ -1996,40 +1996,50 @@ consisting only of string constants, variables, calls to C<encode_entities>
 hard-coded; nothing was modularized or factored out into subroutines.
 
 Against this, I timed a few template systems (L<HTML::Blitz>, L<HTML::Zoom>,
-L<Template::Toolkit>, L<HTML::Template>, L<HTML::Template::Pro>) as well as
-L<HTML::Blitz::Builder>, which is rather the opposite of a template system.
+L<Template::Toolkit>, L<HTML::Template>, L<HTML::Template::Pro>,
+L<Text::Xslate>) as well as L<HTML::Blitz::Builder>, which is rather the
+opposite of a template system.
 
 Results:
 
 =over
 
+=item L<Text::Xslate> v3.5.9 (XS)
+
+1369/s (0.0007s per iteration), 367%
+
 =item baseline
 
-402/s (0.0025s per iteration), 100% (of baseline performance, the theoretical maximum)
+373/s (0.0027s per iteration), 100% (of baseline performance, the theoretical
+maximum reachable with pure Perl code)
 
 =item HTML::Blitz 0.06
 
-353/s (0.0028s per iteration), 87.8%
+332/s (0.0030s per iteration), 89.0%
 
-=item HTML::Template::Pro 0.9524
+=item L<HTML::Template::Pro> 0.9524
 
-328/s (0.0030s per iteration), 81.6%
+316/s (0.0032s per iteration), 84.7%
 
-=item Template::Toolkit 3.101
+=item L<Template::Toolkit> 3.101
 
-42.0/s (0.0238s per iteration), 10.4%
+39.0/s (0.0256s per iteration), 10.5%
 
-=item HTML::Blitz::Builder 0.06
+=item L<HTML::Blitz::Builder> 0.06
 
-35.7/s (0.0280s per iteration), 8.9%
+33.6/s (0.0298s per iteration), 9.0%
 
-=item HTML::Template 2.97
+=item L<HTML::Template> 2.97
 
-34.2/s (0.0292s per iteration), 8.5%
+31.9/s (0.0313s per iteration), 8.6%
 
-=item HTML::Zoom 0.009009
+=item L<Text::Xslate> v3.5.9 (pure Perl)
 
-1.23/s (0.8130s per iteration), 0.3%
+23.8/s (0.0420s per iteration), 6.4%
+
+=item L<HTML::Zoom> 0.009009
+
+1.17/s (0.8547s per iteration), 0.3%
 
 =back
 
@@ -2057,6 +2067,13 @@ of maintainability for speed. In fact, it still runs at 80%-90% of that speed.
 
 HTML::Blitz can, depending on your workload, run faster than
 L<HTML::Template::Pro>, which is written in C for speed.
+
+=item *
+
+For simple templates it is hard to beat the raw performance of L<Text::Xslate>.
+The only downsides are that it requires a C compiler and pulls in an entire
+object system as a dependency (L<Mouse>). (Without a C compiler it will still
+run, but the performance of its pure Perl backend is not competitive.)
 
 =back
 

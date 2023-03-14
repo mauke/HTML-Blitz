@@ -1242,38 +1242,48 @@ consisting only of string constants, variables, calls to `encode_entities`
 hard-coded; nothing was modularized or factored out into subroutines.
 
 Against this, I timed a few template systems ([HTML::Blitz](https://metacpan.org/pod/HTML%3A%3ABlitz), [HTML::Zoom](https://metacpan.org/pod/HTML%3A%3AZoom),
-[Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit), [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate), [HTML::Template::Pro](https://metacpan.org/pod/HTML%3A%3ATemplate%3A%3APro)) as well as
-[HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder), which is rather the opposite of a template system.
+[Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit), [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate), [HTML::Template::Pro](https://metacpan.org/pod/HTML%3A%3ATemplate%3A%3APro),
+[Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)) as well as [HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder), which is rather the
+opposite of a template system.
 
 Results:
 
+- [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) v3.5.9 (XS)
+
+    1369/s (0.0007s per iteration), 367%
+
 - baseline
 
-    402/s (0.0025s per iteration), 100% (of baseline performance, the theoretical maximum)
+    373/s (0.0027s per iteration), 100% (of baseline performance, the theoretical
+    maximum reachable with pure Perl code)
 
 - HTML::Blitz 0.06
 
-    353/s (0.0028s per iteration), 87.8%
+    332/s (0.0030s per iteration), 89.0%
 
-- HTML::Template::Pro 0.9524
+- [HTML::Template::Pro](https://metacpan.org/pod/HTML%3A%3ATemplate%3A%3APro) 0.9524
 
-    328/s (0.0030s per iteration), 81.6%
+    316/s (0.0032s per iteration), 84.7%
 
-- Template::Toolkit 3.101
+- [Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit) 3.101
 
-    42.0/s (0.0238s per iteration), 10.4%
+    39.0/s (0.0256s per iteration), 10.5%
 
-- HTML::Blitz::Builder 0.06
+- [HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder) 0.06
 
-    35.7/s (0.0280s per iteration), 8.9%
+    33.6/s (0.0298s per iteration), 9.0%
 
-- HTML::Template 2.97
+- [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate) 2.97
 
-    34.2/s (0.0292s per iteration), 8.5%
+    31.9/s (0.0313s per iteration), 8.6%
 
-- HTML::Zoom 0.009009
+- [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) v3.5.9 (pure Perl)
 
-    1.23/s (0.8130s per iteration), 0.3%
+    23.8/s (0.0420s per iteration), 6.4%
+
+- [HTML::Zoom](https://metacpan.org/pod/HTML%3A%3AZoom) 0.009009
+
+    1.17/s (0.8547s per iteration), 0.3%
 
 Conclusions:
 
@@ -1286,6 +1296,10 @@ a noticeable impact on performance.
 of maintainability for speed. In fact, it still runs at 80%-90% of that speed.
 - HTML::Blitz can, depending on your workload, run faster than
 [HTML::Template::Pro](https://metacpan.org/pod/HTML%3A%3ATemplate%3A%3APro), which is written in C for speed.
+- For simple templates it is hard to beat the raw performance of [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate).
+The only downsides are that it requires a C compiler and pulls in an entire
+object system as a dependency ([Mouse](https://metacpan.org/pod/Mouse)). (Without a C compiler it will still
+run, but the performance of its pure Perl backend is not competitive.)
 
 # WHY THE NAME
 

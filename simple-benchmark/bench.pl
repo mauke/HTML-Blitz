@@ -3,13 +3,15 @@ use strict;
 use warnings;
 use utf8;
 use Benchmark qw(:hireswallclock cmpthese);
+use File::Temp ();
 use HTML::Entities qw(encode_entities);
 use HTML::Blitz ();
 use HTML::Blitz::Builder qw(mk_doctype mk_comment mk_elem to_html);
-use HTML::Zoom ();
-use Template ();
 use HTML::Template ();
 use HTML::Template::Pro ();
+use HTML::Zoom ();
+use Template ();
+use Text::Xslate ();
 
 my $data = [];
 {
@@ -159,7 +161,13 @@ my $html_template_pro = HTML::Template::Pro->new(
     case_sensitive => 1,
 );
 
-cmpthese(-5, {
+my $xslate_cache = File::Temp->newdir('xslate-cache-XXXXXX', TMPDIR => 1);
+my $xslate = Text::Xslate->new(
+    cache_dir => $xslate_cache->dirname,
+);
+$xslate->load_file('bench.tx');
+
+cmpthese(-10, {
     'HTML-Template-Pro' => sub {
         my %html_template_data = (
             category => [
@@ -416,6 +424,10 @@ cmpthese(-5, {
             or die "TT2 error: " . $tt_template->error;
     },
 
+    'Text-Xslate' => sub {
+        my $result = $xslate->render('bench.tx', { data => $data });
+    },
+
     'handwritten' => sub {
         my $html = "";
         $html .= "<!DOCTYPE html>\n";
@@ -577,7 +589,7 @@ worked hard for his master. At last he said, ‘Master, my time is up; I must
 go home and see my poor mother once more: so pray pay me my wages and let
 me go.’ And the master said, ‘You have been a faithful and good servant,
 Hans, so your pay shall be handsome.’ Then he gave him a lump of silver as
-big as his head. 
+big as his head.
 
 Hans took out his pocket-handkerchief, put the piece of silver into it,
 threw it over his shoulder, and jogged off on his road homewards. As he
@@ -625,7 +637,7 @@ such a prize!’ ‘Well,’ said the shepherd, ‘if you are so fond of her, I
 will change my cow for your horse; I like to do good to my neighbours, even
 though I lose by it myself.’ ‘Done!’ said Hans, merrily. ‘What a noble
 heart that good man has!’ thought he. Then the shepherd jumped upon the
-horse, wished Hans and the cow good morning, and away he rode. 
+horse, wished Hans and the cow good morning, and away he rode.
 EOF
             mk_elem(title => "Templatized torture test - Bencherino!"),
             mk_elem(style => <<'EOF'),

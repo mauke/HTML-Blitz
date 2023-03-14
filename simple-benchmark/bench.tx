@@ -98,42 +98,42 @@ h1, h2, h3, h4, h5, h6 {
 
         <h1>A page with assorted random data</h1>
 
-        <TMPL_LOOP category>
+        : for $data -> $category {
         <section class="category">
-            <h2 class="cat-name cat-start" id="<TMPL_VAR cid>"><TMPL_VAR name></h2>
+            <h2 class="cat-name cat-start" id="cid-<: $category.cid :>"><: $category.name :></h2>
             <div class="cardbox">
-                <TMPL_LOOP card>
+                : for $category.card -> $card {
                 <div class="card">
-                    <h3 class="card-name"><TMPL_VAR name></h3>
-                    <img src="<TMPL_VAR img_src>" alt="<TMPL_VAR img_alt>" />
+                    <h3 class="card-name"><: $card.name :></h3>
+                    <img src="<: $card.img_src :>" alt="<: $card.img_alt :>" />
                     <!-- ^ HTML::Zoom requires this "/" -->
-                    <p>(Category: <a class="cat-name cat-link" href="<TMPL_VAR cid_link>"><TMPL_VAR category_name></a>)</p>
+                    <p>(Category: <a class="cat-name cat-link" href="#cid-<: $category.cid :>"><: $category.name :></a>)</p>
                     <div class="description">
-                        <TMPL_LOOP description>
+                        : for $card.description -> $para {
                         <p class="desc-para">
-                        <TMPL_VAR para>
+                        <: $para :>
                         </p>
-                        </TMPL_LOOP>
+                        : }
                     </div>
                     <h4>Locations</h4>
                     <ul>
-                        <TMPL_LOOP location>
+                        : for $card.location -> $location {
                         <li class="location">
-                            <p class="loc-name"><TMPL_VAR name></p>
+                            <p class="loc-name"><: $location.name :></p>
                             <h5>Times</h5>
                             <ul class="times">
-                                <TMPL_LOOP times>
-                                <li class="time"><TMPL_VAR time></li>
-                                </TMPL_LOOP>
+                                : for $location.times -> $time {
+                                <li class="time"><: $time :></li>
+                                : }
                             </ul>
                         </li>
-                        </TMPL_LOOP>
+                        : }
                     </ul>
                 </div>
-                </TMPL_LOOP>
+                : }
             </div>
         </section>
-        </TMPL_LOOP>
+        : }
 
     </body>
 
