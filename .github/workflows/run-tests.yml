@@ -3,7 +3,7 @@ on:
   [push, pull_request]
 
 jobs:
-  perl_tester:
+  perl_matrix:
     strategy:
       fail-fast: false
       matrix:
@@ -29,6 +29,16 @@ jobs:
         uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl-version }}
+      - run: cpanm --installdeps --with-develop --notest .
+      - run: perl Makefile.PL
+      - run: make test
+  coverage:
+    runs-on: ubuntu-latest
+    name: "test coverage via Coveralls.io"
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Set up perl"
+        uses: shogo82148/actions-setup-perl@v1
       - run: cpanm --installdeps --with-develop --notest .
       - run: cpanm --notest Devel::Cover::Report::Coveralls
       - run: perl Makefile.PL
