@@ -10,8 +10,20 @@ use HTML::Blitz::Builder qw(mk_doctype mk_comment mk_elem to_html);
 use HTML::Template ();
 use HTML::Template::Pro ();
 use HTML::Zoom ();
+use Mojo::Template ();
 use Template ();
 use Text::Xslate ();
+
+sub vers {
+    my ($pkg) = @_;
+    my $vpkg =
+        $pkg =~ /^Mojo::/ ? do { require Mojolicious; Mojolicious:: } :
+        $pkg =~ /^Template::/ ? do { require Template; Template:: } :
+        $pkg;
+    my $v = $vpkg->VERSION
+        // die "$vpkg has no version";
+    "$pkg $v"
+}
 
 my $data = [];
 {
@@ -36,6 +48,7 @@ my $data = [];
                     $gen_img_data->(),
                     name        => "Card $_",
                     description => [
+                        map +{ para => $_ },
                         (
                             "Lorem ipsum dolor sit amet, consectetur adipiscing
                             elit, sed do eiusmod tempor incididunt ut labore et
@@ -74,7 +87,7 @@ my $data = [];
                                 name  => "Location name $outer-" . ($_ + 1),
                                 times => [
                                     map
-                                        sprintf('%02u:%02u', 7 + $_, $_ % 2 ? 30 : 0),
+                                        +{ time => sprintf('%02u:%02u', 7 + $_, $_ % 2 ? 30 : 0) },
                                         0 .. ($outer + $_ + 1) % 7
                                 ],
                             }, 0 .. ($outer + 1) % 4
@@ -167,8 +180,27 @@ my $xslate = Text::Xslate->new(
 );
 $xslate->load_file('bench.tx');
 
-cmpthese(-10, {
-    'HTML-Template-Pro' => sub {
+my $mojo_template = do {
+    my $filename = 'bench.mt';
+    my $mt = Mojo::Template->new(
+        auto_escape => 1,
+        vars        => 1,
+        name        => $filename,
+    );
+
+    $mt->parse(do {
+        open my $fh, '<:encoding(UTF-8)',  $filename or die "$filename: $!";
+        local $/;
+        readline $fh
+    })
+};
+
+cmpthese(-5, {
+    vers('Mojo::Template') => sub {
+        my $result = $mojo_template->process({ data => $data });
+    },
+
+    vers('HTML::Template::Pro') => sub {
         my %html_template_data = (
             category => [
                 map {
@@ -179,24 +211,9 @@ cmpthese(-10, {
                         cid      => "cid-$_->{cid}",
                         card => [
                             map +{
-                                    category_name => $category_name,
-                                    cid_link      => $cid_link,
-                                    img_src       => $_->{img_src},
-                                    img_alt       => $_->{img_alt},
-                                    name          => $_->{name},
-                                    description   => [
-                                        map +{ para => $_ },
-                                            @{$_->{description}}
-                                    ],
-                                    location      => [
-                                        map +{
-                                            name  => $_->{name},
-                                            times => [
-                                                map +{ time => $_ },
-                                                    @{$_->{times}}
-                                            ],
-                                        }, @{$_->{location}}
-                                    ],
+                                category_name => $category_name,
+                                cid_link      => $cid_link,
+                                %$_,
                             }, @{$_->{card}}
                         ],
                     }
@@ -209,7 +226,7 @@ cmpthese(-10, {
         $html_template_pro->clear_params;
     },
 
-    'HTML-Template' => sub {
+    vers('HTML::Template') => sub {
         my %html_template_data = (
             category => [
                 map {
@@ -220,24 +237,9 @@ cmpthese(-10, {
                         cid      => "cid-$_->{cid}",
                         card => [
                             map +{
-                                    category_name => $category_name,
-                                    cid_link      => $cid_link,
-                                    img_src       => $_->{img_src},
-                                    img_alt       => $_->{img_alt},
-                                    name          => $_->{name},
-                                    description   => [
-                                        map +{ para => $_ },
-                                            @{$_->{description}}
-                                    ],
-                                    location      => [
-                                        map +{
-                                            name  => $_->{name},
-                                            times => [
-                                                map +{ time => $_ },
-                                                    @{$_->{times}}
-                                            ],
-                                        }, @{$_->{location}}
-                                    ],
+                                category_name => $category_name,
+                                cid_link      => $cid_link,
+                                %$_,
                             }, @{$_->{card}}
                         ],
                     }
@@ -250,7 +252,7 @@ cmpthese(-10, {
         $html_template->clear_params;
     },
 
-    'HTML-Zoom' => sub {
+    vers('HTML::Zoom') => sub {
         my $zoom = $proto_zoom
             ->select('.category')
             ->repeat([
@@ -270,7 +272,7 @@ cmpthese(-10, {
                                     ->select('.card-name')->replace_content($card->{name})
                                     ->select('.description')->repeat_content([
                                         map {
-                                            my $para = $_;
+                                            my $para = $_->{para};
                                             sub {
                                                 $_
                                                 ->select('.desc-para')->replace_content($para)
@@ -286,7 +288,7 @@ cmpthese(-10, {
                                                 ->select('.loc-name')->replace_content($location->{name})
                                                 ->select('.times')->repeat_content([
                                                     map {
-                                                        my $time = $_;
+                                                        my $time = $_->{time};
                                                         sub {
                                                             $_
                                                             ->select('.time')->replace_content($time)
@@ -310,33 +312,14 @@ cmpthese(-10, {
         my $result = $zoom->to_html;
     },
 
-    'HTML-Blitz' => sub {
+    vers('HTML::Blitz') => sub {
         my $blitz_data = {
             category => [
                 map +{
                     name     => $_->{name},
                     cid      => "cid-$_->{cid}",
                     cid_link => "#cid-$_->{cid}",
-                    card => [
-                        map +{
-                                img_src => $_->{img_src},
-                                img_alt => $_->{img_alt},
-                                name    => $_->{name},
-                                description => [
-                                    map +{  para => $_ },
-                                        @{$_->{description}}
-                                ],
-                                location    => [
-                                    map +{
-                                        name => $_->{name},
-                                        times => [
-                                            map +{ time => $_ },
-                                                @{$_->{times}}
-                                        ],
-                                    }, @{$_->{location}}
-                                ],
-                        }, @{$_->{card}}
-                    ],
+                    card     => $_->{card},
                 }, @$data
             ],
         };
@@ -392,26 +375,7 @@ cmpthese(-10, {
                     name     => $_->{name},
                     cid      => "cid-$_->{cid}",
                     cid_link => "#cid-$_->{cid}",
-                    card => [
-                        map +{
-                                img_src => $_->{img_src},
-                                img_alt => $_->{img_alt},
-                                name    => $_->{name},
-                                description => [
-                                    map +{  para => $_ },
-                                        @{$_->{description}}
-                                ],
-                                location    => [
-                                    map +{
-                                        name => $_->{name},
-                                        times => [
-                                            map +{ time => $_ },
-                                                @{$_->{times}}
-                                        ],
-                                    }, @{$_->{location}}
-                                ],
-                        }, @{$_->{card}}
-                    ],
+                    card     => $_->{card},
                 }, @$data
             ],
         };
@@ -419,12 +383,12 @@ cmpthese(-10, {
         my $result = $template->process($blitz_data);
     },
 
-    'Template-Toolkit' => sub {
+    vers('Template::Toolkit') => sub {
         $tt_template->process('bench.tt', { data => $data }, \my $result)
             or die "TT2 error: " . $tt_template->error;
     },
 
-    'Text-Xslate' => sub {
+    vers('Text::Xslate') => sub {
         my $result = $xslate->render('bench.tx', { data => $data });
     },
 
@@ -447,7 +411,7 @@ cmpthese(-10, {
         $html .= "    go home and see my poor mother once more: so pray pay me my wages and let\n";
         $html .= "    me go.’ And the master said, ‘You have been a faithful and good servant,\n";
         $html .= "    Hans, so your pay shall be handsome.’ Then he gave him a lump of silver as\n";
-        $html .= "    big as his head. \n";
+        $html .= "    big as his head.\n";
         $html .= "\n";
         $html .= "    Hans took out his pocket-handkerchief, put the piece of silver into it,\n";
         $html .= "    threw it over his shoulder, and jogged off on his road homewards. As he\n";
@@ -495,7 +459,7 @@ cmpthese(-10, {
         $html .= "    will change my cow for your horse; I like to do good to my neighbours, even\n";
         $html .= "    though I lose by it myself.’ ‘Done!’ said Hans, merrily. ‘What a noble\n";
         $html .= "    heart that good man has!’ thought he. Then the shepherd jumped upon the\n";
-        $html .= "    horse, wished Hans and the cow good morning, and away he rode. \n";
+        $html .= "    horse, wished Hans and the cow good morning, and away he rode.\n";
         $html .= "        -->\n";
         $html .= "        <title>Templatized torture test - Bencherino!</title>\n";
         $html .= "\n";
@@ -542,7 +506,7 @@ cmpthese(-10, {
                 $html .= "                    <p>(Category: <a class=\"cat-name cat-link\" href=\"" . encode_entities("#cid-$category->{cid}") . "\">" . encode_entities($category->{name}) . "</a>)</p>\n";
                 $html .= "                    <div class=\"description\">\n";
                 for my $para (@{$card->{description}}) {
-                    $html .= "                        <p class=\"desc-para\">" . encode_entities($para) . "</p>\n";
+                    $html .= "                        <p class=\"desc-para\">" . encode_entities($para->{para}) . "</p>\n";
                 }
                 $html .= "                    </div>\n";
                 $html .= "                    <h4>Locations</h4>\n";
@@ -553,7 +517,7 @@ cmpthese(-10, {
                     $html .= "                            <h5>Times</h5>\n";
                     $html .= "                            <ul class=\"times\">\n";
                     for my $time (@{$location->{times}}) {
-                        $html .= "                                <li class=\"time\">" . encode_entities($time) . "</li>\n";
+                        $html .= "                                <li class=\"time\">" . encode_entities($time->{time}) . "</li>\n";
                     }
                     $html .= "                            </ul>\n";
                     $html .= "                        </li>\n";
@@ -573,7 +537,7 @@ cmpthese(-10, {
 
     },
 
-    'HTML-Blitz-Builder' => sub {
+    vers('HTML::Blitz::Builder') => sub {
         my @head = (
             mk_elem(meta => { charset => 'utf-8' }),
             mk_comment(<<'EOF'),
@@ -673,7 +637,7 @@ EOF
                 my @description;
                 for my $para (@{$card->{description}}) {
                     push @description, mk_elem(p => { class => 'desc-para' },
-                        $para,
+                        $para->{para},
                     );
                 }
 
@@ -683,7 +647,7 @@ EOF
                     my @times;
                     for my $time (@{$location->{times}}) {
                         push @times, mk_elem(li => { class => 'time' },
-                            $time,
+                            $time->{time},
                         );
                     }
 

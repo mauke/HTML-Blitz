@@ -98,42 +98,42 @@ h1, h2, h3, h4, h5, h6 {
 
         <h1>A page with assorted random data</h1>
 
-        [% FOREACH category IN data %]
+        % for my $category (@$data) {
         <section class="category">
-            <h2 class="cat-name cat-start" id="[% "cid-${category.cid}" | html %]">[% category.name | html %]</h2>
+            <h2 class="cat-name cat-start" id="cid-<%= $category->{cid} %>"><%= $category->{name} %></h2>
             <div class="cardbox">
-                [% FOREACH card IN category.card %]
+                % for my $card (@{$category->{card}}) {
                 <div class="card">
-                    <h3 class="card-name">[% card.name | html %]</h3>
-                    <img src="[% card.img_src | html %]" alt="[% card.img_alt | html %]" />
+                    <h3 class="card-name"><%= $card->{name} %></h3>
+                    <img src="<%= $card->{img_src} %>" alt="<%= $card->{img_alt} %>" />
                     <!-- ^ HTML::Zoom requires this "/" -->
-                    <p>(Category: <a class="cat-name cat-link" href="[% "#cid-${category.cid}" | html %]">[% category.name | html %]</a>)</p>
+                    <p>(Category: <a class="cat-name cat-link" href="#cid-<%= $category->{cid} %>"><%= $category->{name} %></a>)</p>
                     <div class="description">
-                        [% FOREACH para IN card.description %]
+                        % for my $para (@{$card->{description}}) {
                         <p class="desc-para">
-                        [% para.para | html %]
+                        <%= $para->{para} %>
                         </p>
-                        [% END %]
+                        % }
                     </div>
                     <h4>Locations</h4>
                     <ul>
-                        [% FOREACH location IN card.location %]
+                        % for my $location (@{$card->{location}}) {
                         <li class="location">
-                            <p class="loc-name">[% location.name | html %]</p>
+                            <p class="loc-name"><%= $location->{name} %></p>
                             <h5>Times</h5>
                             <ul class="times">
-                                [% FOREACH time IN location.times %]
-                                <li class="time">[% time.time | html %]</li>
-                                [% END %]
+                                % for my $time (@{$location->{times}}) {
+                                <li class="time"><%= $time->{time} %></li>
+                                % }
                             </ul>
                         </li>
-                        [% END %]
+                        % }
                     </ul>
                 </div>
-                [% END %]
+                % }
             </div>
         </section>
-        [% END %]
+        % }
 
     </body>
 

@@ -111,7 +111,7 @@ h1, h2, h3, h4, h5, h6 {
                     <div class="description">
                         : for $card.description -> $para {
                         <p class="desc-para">
-                        <: $para :>
+                        <: $para.para :>
                         </p>
                         : }
                     </div>
@@ -123,7 +123,7 @@ h1, h2, h3, h4, h5, h6 {
                             <h5>Times</h5>
                             <ul class="times">
                                 : for $location.times -> $time {
-                                <li class="time"><: $time :></li>
+                                <li class="time"><: $time.time :></li>
                                 : }
                             </ul>
                         </li>

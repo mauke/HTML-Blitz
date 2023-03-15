@@ -730,11 +730,13 @@ method apply_to_file($file) {
 1
 __END__
 
+=encoding utf8
+
+=for markdown [![Coverage Status](https://coveralls.io/repos/github/mauke/HTML-Blitz/badge.svg?branch=main)](https://coveralls.io/github/mauke/HTML-Blitz?branch=main)
+
 =head1 NAME
 
 HTML::Blitz - high-performance, selector-based, content-aware HTML template engine
-
-=for markdown [![Coverage Status](https://coveralls.io/repos/github/mauke/HTML-Blitz/badge.svg?branch=main)](https://coveralls.io/github/mauke/HTML-Blitz?branch=main)
 
 =head1 SYNOPSIS
 
@@ -1999,49 +2001,48 @@ hard-coded; nothing was modularized or factored out into subroutines.
 
 Against this, I timed a few template systems (L<HTML::Blitz>, L<HTML::Zoom>,
 L<Template::Toolkit>, L<HTML::Template>, L<HTML::Template::Pro>,
-L<Text::Xslate>) as well as L<HTML::Blitz::Builder>, which is rather the
-opposite of a template system.
+L<Mojo::Template>, L<Text::Xslate>) as well as L<HTML::Blitz::Builder>, which
+is rather the opposite of a template system.
 
 Results:
 
 =over
 
-=item L<Text::Xslate> v3.5.9 (XS)
+=item L<Text::Xslate> v3.5.9
 
-1369/s (0.0007s per iteration), 367%
+1375/s (0.0007s per iteration), 380.9%
 
-=item baseline
+=item L<HTML::Blitz> 0.06
 
-373/s (0.0027s per iteration), 100% (of baseline performance, the theoretical
-maximum reachable with pure Perl code)
-
-=item HTML::Blitz 0.06
-
-332/s (0.0030s per iteration), 89.0%
+678/s (0.0015s per iteration), 187.8%
 
 =item L<HTML::Template::Pro> 0.9524
 
-316/s (0.0032s per iteration), 84.7%
+653/s (0.0015s per iteration), 180.9%
+
+=item L<Mojo::Template> 9.31
+
+463/s (0.0022s per iteration), 128.3%
+
+=item handwritten
+
+361/s (0.0028s per iteration), 100.0%
 
 =item L<Template::Toolkit> 3.101
 
-39.0/s (0.0256s per iteration), 10.5%
-
-=item L<HTML::Blitz::Builder> 0.06
-
-33.6/s (0.0298s per iteration), 9.0%
+38.6/s (0.0259s per iteration), 10.7%
 
 =item L<HTML::Template> 2.97
 
-31.9/s (0.0313s per iteration), 8.6%
+33.5/s (0.0299s per iteration), 9.3%
 
-=item L<Text::Xslate> v3.5.9 (pure Perl)
+=item L<HTML::Blitz::Builder> 0.06
 
-23.8/s (0.0420s per iteration), 6.4%
+32.9/s (0.0304s per iteration), 9.1%
 
 =item L<HTML::Zoom> 0.009009
 
-1.17/s (0.8547s per iteration), 0.3%
+1.24/s (0.8065s per iteration), 0.3%
 
 =back
 
@@ -2062,8 +2063,13 @@ L<HTML::Zoom> by a factor of 200 or 300. A dataset that might take HTML::Blitz
 
 =item *
 
-HTML::Blitz is competitive with hand-written code that sacrifices all semblance
-of maintainability for speed. In fact, it still runs at 80%-90% of that speed.
+HTML::Blitz and L<Mojo::Template> are faster than hand-written code. This is
+probably because the hand-written code appends each line separately to the
+output string and escapes each template parameter by calling
+L<C<HTML::Entities::encode_entities>|HTML::Entities/encode_entities( $string )>
+– whereas HTML::Blitz and L<Mojo::Template> fold all adjacent constant HTML
+pieces into one big string in advance and use their own optimized HTML escape
+routine.
 
 =item *
 
@@ -2072,10 +2078,12 @@ L<HTML::Template::Pro>, which is written in C for speed.
 
 =item *
 
-For simple templates it is hard to beat the raw performance of L<Text::Xslate>.
-The only downsides are that it requires a C compiler and pulls in an entire
-object system as a dependency (L<Mouse>). (Without a C compiler it will still
-run, but the performance of its pure Perl backend is not competitive.)
+In this comparison, the only system that beats HTML::Blitz in terms of raw
+speed is the XS version of L<Text::Xslate> (by a factor of about 2). The only
+downsides are that it requires a C compiler and pulls in an entire object
+system as a dependency (L<Mouse>). (Without a C compiler it will still run, but
+the performance of its pure Perl backend is not competitive, reaching only
+about two thirds of the speed of L<HTML::Blitz::Builder>.)
 
 =back
 

@@ -1,8 +1,8 @@
+[![Coverage Status](https://coveralls.io/repos/github/mauke/HTML-Blitz/badge.svg?branch=main)](https://coveralls.io/github/mauke/HTML-Blitz?branch=main)
+
 # NAME
 
 HTML::Blitz - high-performance, selector-based, content-aware HTML template engine
-
-[![Coverage Status](https://coveralls.io/repos/github/mauke/HTML-Blitz/badge.svg?branch=main)](https://coveralls.io/github/mauke/HTML-Blitz?branch=main)
 
 # SYNOPSIS
 
@@ -1245,47 +1245,46 @@ hard-coded; nothing was modularized or factored out into subroutines.
 
 Against this, I timed a few template systems ([HTML::Blitz](https://metacpan.org/pod/HTML%3A%3ABlitz), [HTML::Zoom](https://metacpan.org/pod/HTML%3A%3AZoom),
 [Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit), [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate), [HTML::Template::Pro](https://metacpan.org/pod/HTML%3A%3ATemplate%3A%3APro),
-[Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)) as well as [HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder), which is rather the
-opposite of a template system.
+[Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate), [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate)) as well as [HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder), which
+is rather the opposite of a template system.
 
 Results:
 
-- [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) v3.5.9 (XS)
+- [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) v3.5.9
 
-    1369/s (0.0007s per iteration), 367%
+    1375/s (0.0007s per iteration), 380.9%
 
-- baseline
+- [HTML::Blitz](https://metacpan.org/pod/HTML%3A%3ABlitz) 0.06
 
-    373/s (0.0027s per iteration), 100% (of baseline performance, the theoretical
-    maximum reachable with pure Perl code)
-
-- HTML::Blitz 0.06
-
-    332/s (0.0030s per iteration), 89.0%
+    678/s (0.0015s per iteration), 187.8%
 
 - [HTML::Template::Pro](https://metacpan.org/pod/HTML%3A%3ATemplate%3A%3APro) 0.9524
 
-    316/s (0.0032s per iteration), 84.7%
+    653/s (0.0015s per iteration), 180.9%
+
+- [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) 9.31
+
+    463/s (0.0022s per iteration), 128.3%
+
+- handwritten
+
+    361/s (0.0028s per iteration), 100.0%
 
 - [Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit) 3.101
 
-    39.0/s (0.0256s per iteration), 10.5%
-
-- [HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder) 0.06
-
-    33.6/s (0.0298s per iteration), 9.0%
+    38.6/s (0.0259s per iteration), 10.7%
 
 - [HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate) 2.97
 
-    31.9/s (0.0313s per iteration), 8.6%
+    33.5/s (0.0299s per iteration), 9.3%
 
-- [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) v3.5.9 (pure Perl)
+- [HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder) 0.06
 
-    23.8/s (0.0420s per iteration), 6.4%
+    32.9/s (0.0304s per iteration), 9.1%
 
 - [HTML::Zoom](https://metacpan.org/pod/HTML%3A%3AZoom) 0.009009
 
-    1.17/s (0.8547s per iteration), 0.3%
+    1.24/s (0.8065s per iteration), 0.3%
 
 Conclusions:
 
@@ -1294,14 +1293,21 @@ a noticeable impact on performance.
 - HTML::Blitz is orders of magnitude faster. It can easily outperform
 [HTML::Zoom](https://metacpan.org/pod/HTML%3A%3AZoom) by a factor of 200 or 300. A dataset that might take HTML::Blitz
 20 milliseconds to zip through would lock up [HTML::Zoom](https://metacpan.org/pod/HTML%3A%3AZoom) for over 5 seconds.
-- HTML::Blitz is competitive with hand-written code that sacrifices all semblance
-of maintainability for speed. In fact, it still runs at 80%-90% of that speed.
+- HTML::Blitz and [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) are faster than hand-written code. This is
+probably because the hand-written code appends each line separately to the
+output string and escapes each template parameter by calling
+[`HTML::Entities::encode_entities`](https://metacpan.org/pod/HTML%3A%3AEntities#encode_entities-string)
+– whereas HTML::Blitz and [Mojo::Template](https://metacpan.org/pod/Mojo%3A%3ATemplate) fold all adjacent constant HTML
+pieces into one big string in advance and use their own optimized HTML escape
+routine.
 - HTML::Blitz can, depending on your workload, run faster than
 [HTML::Template::Pro](https://metacpan.org/pod/HTML%3A%3ATemplate%3A%3APro), which is written in C for speed.
-- For simple templates it is hard to beat the raw performance of [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate).
-The only downsides are that it requires a C compiler and pulls in an entire
-object system as a dependency ([Mouse](https://metacpan.org/pod/Mouse)). (Without a C compiler it will still
-run, but the performance of its pure Perl backend is not competitive.)
+- In this comparison, the only system that beats HTML::Blitz in terms of raw
+speed is the XS version of [Text::Xslate](https://metacpan.org/pod/Text%3A%3AXslate) (by a factor of about 2). The only
+downsides are that it requires a C compiler and pulls in an entire object
+system as a dependency ([Mouse](https://metacpan.org/pod/Mouse)). (Without a C compiler it will still run, but
+the performance of its pure Perl backend is not competitive, reaching only
+about two thirds of the speed of [HTML::Blitz::Builder](https://metacpan.org/pod/HTML%3A%3ABlitz%3A%3ABuilder).)
 
 # WHY THE NAME
 
