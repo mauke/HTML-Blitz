@@ -85,7 +85,7 @@ my $hjonk = "hj\N{LATIN SMALL LETTER O WITH DOUBLE ACUTE}nk";
         <h1>\N{INVERTED EXCLAMATION MARK}Document title with \N{EURO SIGN} \N{LATIN SMALL LETTER A WITH ACUTE}!</h1>
         <!--# $hjonk -->
         <label>Input: <input class=dummy value="XXX sample"></label>
-        <p class=dummy>XXX weird</p>
+        <p class=dummy>XXX \N{INVERTED QUESTION MARK}\N{INVERTED QUESTION MARK}weird??</p>
     </body>
 </html>
 _EOF_
