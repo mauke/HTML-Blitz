@@ -63,4 +63,82 @@ _EOT_
 _EOT_
 }
 
+{
+    my $t2 = HTML::Blitz->new(
+        [ '.f', [ replace_inner_var => 't2x' ] ],
+    )->apply_to_html('(t2)', '<span class=f>no</span>');
+
+    my $blitz = HTML::Blitz->new(
+        [ '.f', [ transform_inner_sub    => sub { "f($_[0])" } ] ],
+        [ '.g', [ replace_inner_template => $t2 ] ],
+    );
+
+    my $template = <<'_EOT_';
+<p>x</p>
+<p class=f>x</p>
+<p class=g>y</p>
+<p class="f g">both</p>
+_EOT_
+
+    my $result = $blitz->apply_to_html('(test)', $template)->process({
+        t2x => 'hi',
+    });
+
+    is $result, <<'_EOT_';
+<p>x</p>
+<p class=f>f(x)</p>
+<p class=g><span class=f>hi</span></p>
+<p class="f g"><span class=f>hi</span></p>
+_EOT_
+}
+
+{
+    my $blitz = HTML::Blitz->new(
+        [ '.a', [ remove_attribute        => 'title' ] ],
+        [ '.b', [ set_attribute_text      => 'title', 'vstatic' ] ],
+        [ '.c', [ set_attribute_var       => 'title', 'v' ] ],
+        [ '.d', [ transform_attribute_sub => 'title', sub { "d($_[0])" } ] ],
+    );
+
+    my $template = <<'_EOT_';
+<hr title=x>
+<hr class=a title=x>
+<hr class=b title=x>
+<hr class=c title=x>
+<hr class=d title=x>
+<hr class="a b" title=x>
+<hr class="a c" title=x>
+<hr class="a d" title=x>
+<hr class="b c" title=x>
+<hr class="b c" title=x>
+<hr class="b d" title=x>
+<hr class="c d" title=x>
+<hr class="a b c" title=x>
+<hr class="a b d" title=x>
+<hr class="b c d" title=x>
+<hr class="a b c d" title=x>
+_EOT_
+
+    my $result = $blitz->apply_to_html('(test)', $template)->process({ v => 'vdynamic' });
+
+    is $result, <<'_EOT_';
+<hr title=x>
+<hr class=a>
+<hr class=b title=vstatic>
+<hr class=c title="vdynamic">
+<hr class=d title=d(x)>
+<hr class="a b">
+<hr class="a c">
+<hr class="a d">
+<hr class="b c" title=vstatic>
+<hr class="b c" title=vstatic>
+<hr class="b d" title=vstatic>
+<hr class="c d" title="vdynamic">
+<hr class="a b c">
+<hr class="a b d">
+<hr class="b c d" title=vstatic>
+<hr class="a b c d">
+_EOT_
+}
+
 done_testing;
