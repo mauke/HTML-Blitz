@@ -1100,6 +1100,8 @@ A convenience wrapper around ["apply\_to\_html"](#apply_to_html). It reads the c
 
 # EXAMPLES
 
+## Basic variables and lists/repetition
+
 The following is a complete program:
 
 ```perl
@@ -1191,6 +1193,96 @@ It produces the following output:
         </div>
     </body>
 </html>
+```
+
+## Hashing inline scripts for Content-Security-Policy (CSP)
+
+If you want to protect against JavaScript code injection (also known as
+cross-site scripting or XSS), the first step is to properly escape all user
+input that is presented on a web page. HTML::Blitz aims to make this easy (by
+making it hard to interpolate raw HTML strings into a template).
+
+A second layer of defense is available in the form of the
+[Content-Security-Policy
+(CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) HTTP response
+header. This header gives a web site fine-grained control over which sources a
+browser is allowed to load resources (including script code) from. In
+particular, for inline scripts (i.e. those embedded in HTML within
+`<script>...</script>` tags) their [SHA-2-based
+hashes](https://en.wikipedia.org/wiki/SHA-2) can be added to the
+CSP header. Any other scripts (such as those injected by an attacker) will not
+be executed by the browser, thwarting any XSS attempts.
+
+HTML::Blitz can be used to automatically extract and hash any script code
+embedded in templates. That way you can automatically compute a tailored CSP
+value.
+
+Sample HTML template code:
+
+```html
+<!doctype html>
+<head>
+    <style>
+        #big-red-button {
+            color: white;
+            background-color: red;
+            font-size: larger;
+        }
+    </style>
+    <script>
+        console.log("Hello from the browser console");
+    </script>
+</head>
+<body>
+    <h1>CSP Example</h1>
+    <button id="big-red-button">Click me!</button>
+    <script>
+        document.getElementById('big-red-button').onclick = function () {
+            alert("Hello!");
+        };
+    </script>
+</body>
+```
+
+And the corresponding Perl code:
+
+```perl
+use strict;
+use warnings;
+use HTML::Blitz;
+use Digest::SHA qw(sha256_base64);
+
+# Digest::SHA generates unpadded base64, but CSP requires padding on all
+# base64 strings. This function adds the required padding.
+sub sha256_base64_padded {
+    my ($data) = @_;
+    my $hash = sha256_base64 $data;
+    $hash . '=' x (-length($hash) % 4)
+}
+
+# Returns the script code unchanged, but (as a side effect) adds its
+# SHA-256 hash to the %seen_script_hashes variable.
+my %seen_script_hashes;
+my $add_hash = sub {
+    my ($script) = @_;
+    $seen_script_hashes{sha256_base64_padded $script} = 1;
+    $script
+};
+
+my $blitz = HTML::Blitz->new(
+    # hash the contents of all <script> tags without a src attribute
+    [ 'script:not([src])', [ transform_inner_sub => $add_hash ] ],
+    # ... other rules ...
+);
+
+my $html = $blitz->apply_to_file('scripts.html')->process();
+
+my @hashes = sort keys %seen_script_hashes;
+my $csp = "script-src " . (@hashes ? join(' ', map "'sha256-$_'", @hashes) : "'none'");
+# Now you can set a response header of
+#   Content-Security-Policy: $csp
+# (and a response body of $html) and be sure that only scripts from the
+# original template file will execute.
 ```
 
 # RATIONALE
