@@ -19,7 +19,6 @@ return {
     PREREQ_PM          => {
         'constant'             => 0,
         'feature'              => 0,
-        'indirect'             => '0.36',
         'overload'             => 0,
         'strict'               => 0,
         'warnings'             => 0,
