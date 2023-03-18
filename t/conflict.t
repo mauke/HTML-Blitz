@@ -5,6 +5,7 @@ use HTML::Blitz ();
     my $blitz = HTML::Blitz->new(
         [ '.aa',   [ replace_inner_text => 'AA' ] ],
         [ '.b',    [ replace_inner_var  => 'b' ] ],
+        [ '.b2',   [ replace_inner_var  => 'b2' ] ],
         [ '.aaaa', [ replace_inner_text => 'AAAA' ] ],
     );
 
@@ -17,9 +18,10 @@ use HTML::Blitz ();
 <p class="aa aaaa">x</p>
 <p class="b aaaa">x</p>
 <p class="aa b aaaa">x</p>
+<p class="b aa b2">x</p>
 _EOT_
 
-    my $result = $blitz->apply_to_html('(test)', $template)->process({ b => 'B' });
+    my $result = $blitz->apply_to_html('(test)', $template)->process({ b => 'B', b2 => 'drone' });
 
     is $result, <<'_EOT_';
 <p>x</p>
@@ -30,7 +32,15 @@ _EOT_
 <p class="aa aaaa">AA</p>
 <p class="b aaaa">AAAA</p>
 <p class="aa b aaaa">AA</p>
+<p class="b aa b2">AA</p>
 _EOT_
+
+    $result = $blitz->apply_to_html('(test)', '<p class="b b2">x</p>')->process({ b => 'B', b2 => 'drone' });
+
+    is $result, in_set(
+        '<p class="b b2">B</p>',
+        '<p class="b b2">drone</p>',
+    );
 }
 
 {
@@ -161,6 +171,56 @@ _EOT_
 <hr class="a b c e">
 <hr class="b c d e" title=vstatic>
 <hr class="a b c d e">
+_EOT_
+}
+
+{
+    my $blitz = HTML::Blitz->new(
+        [ '.a', [ replace_all_attributes => { foo => [text => 'a1'], bar => [text => 'a2'] } ] ],
+        [ '.b', [ replace_all_attributes => { foo => [var => 'b'] } ] ],
+        [ '.c', [ replace_all_attributes => { foo => [var => 'c'], bar => [text => 'c2'], baz => [text => 'c3'] } ] ],
+        [ '.d', [ replace_all_attributes => { foo => [text => 'd1'], bar => [text => 'd2'], baz => [text => 'd3'], quux => [text => 'd4'] } ] ],
+    );
+
+    my $template = <<'_EOT_';
+<hr class>
+<hr class=a>
+<hr class=b>
+<hr class=c>
+<hr class=d>
+<hr class="a b">
+<hr class="a c">
+<hr class="a d">
+<hr class="b c">
+<hr class="b d">
+<hr class="c d">
+<hr class="a b c">
+<hr class="a b d">
+<hr class="b c d">
+<hr class="a b c d">
+_EOT_
+
+    my $result = $blitz->apply_to_html('(test)', $template)->process({
+        b => 'bx',
+        c => 'cx',
+    });
+
+    is $result, <<'_EOT_';
+<hr class>
+<hr bar=a2 foo=a1>
+<hr foo="bx">
+<hr bar=c2 baz=c3 foo="cx">
+<hr bar=d2 baz=d3 foo=d1 quux=d4>
+<hr bar=a2 foo=a1>
+<hr bar=a2 foo=a1>
+<hr bar=a2 foo=a1>
+<hr foo="bx">
+<hr bar=d2 baz=d3 foo=d1 quux=d4>
+<hr bar=d2 baz=d3 foo=d1 quux=d4>
+<hr bar=a2 foo=a1>
+<hr bar=a2 foo=a1>
+<hr bar=d2 baz=d3 foo=d1 quux=d4>
+<hr bar=a2 foo=a1>
 _EOT_
 }
 
