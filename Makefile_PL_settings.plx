@@ -13,9 +13,8 @@ return {
         'Fcntl'         => 0,
         'File::Temp'    => '0.2307',
         'FindBin'       => 0,
-        'Test::Builder' => 0,
-        'Test::Fatal'   => 0,
-        'Test::More'    => '0.88',
+        'Test2::API'    => 0,
+        'Test2::V0'     => 0,
     },
     PREREQ_PM          => {
         'constant'             => 0,

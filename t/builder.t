@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
-use Test::Fatal qw(exception);
+use Test2::V0;
 use HTML::Blitz::Builder qw(
     mk_doctype
     mk_comment
@@ -13,11 +10,11 @@ use HTML::Blitz::Builder qw(
 is to_html(mk_doctype), '<!DOCTYPE html>', "mk_doctype works";
 
 is to_html(mk_comment 'hello, world'), '<!--hello, world-->', "mk_comment works";
-like exception { mk_comment '>asdf<' }, qr/comment cannot start with '>'/, "mk_comment throws on '>...'";
-like exception { mk_comment '->asdf<-' }, qr/comment cannot start with '->'/, "mk_comment throws on '->...'";
-like exception { mk_comment 'foo<!--bar' }, qr/comment cannot contain '<!--'/, "mk_comment throws on '...<!--...'";
-like exception { mk_comment 'foo--!>bar' }, qr/comment cannot contain '--!>'/, "mk_comment throws on '...--!>...'";
-like exception { mk_comment 'foo-->bar' }, qr/comment cannot contain '-->'/, "mk_comment throws on '...-->...'";
+like dies { mk_comment '>asdf<' }, qr/comment cannot start with '>'/, "mk_comment throws on '>...'";
+like dies { mk_comment '->asdf<-' }, qr/comment cannot start with '->'/, "mk_comment throws on '->...'";
+like dies { mk_comment 'foo<!--bar' }, qr/comment cannot contain '<!--'/, "mk_comment throws on '...<!--...'";
+like dies { mk_comment 'foo--!>bar' }, qr/comment cannot contain '--!>'/, "mk_comment throws on '...--!>...'";
+like dies { mk_comment 'foo-->bar' }, qr/comment cannot contain '-->'/, "mk_comment throws on '...-->...'";
 
 is to_html(mk_elem 'p'), '<p></p>', 'basic element';
 is to_html(mk_elem 'br'), '<br>', 'basic void element';
@@ -49,13 +46,13 @@ is to_html(mk_elem 'br'), '<br>', 'basic void element';
 
 is to_html(mk_elem 'style', '&&&'), '<style>&&&</style>', "basic <style>";
 is to_html(mk_elem 'style', '</style'), '<style></style</style>', "weird '</style' works";
-like exception { mk_elem 'style', '</style ' }, qr{tag cannot contain '</style '}, "style containing '</style ' throws";
-like exception { mk_elem 'style', '</style/' }, qr{tag cannot contain '</style/'}, "style containing '</style/' throws";
+like dies { mk_elem 'style', '</style ' }, qr{tag cannot contain '</style '}, "style containing '</style ' throws";
+like dies { mk_elem 'style', '</style/' }, qr{tag cannot contain '</style/'}, "style containing '</style/' throws";
 
 is to_html(mk_elem 'script', '&&&'), '<script>&&&</script>', "basic <script>";
 is to_html(mk_elem 'script', '</script'), '<script></script</script>', "weird '</script' works";
-like exception { mk_elem 'script', '</script ' }, qr{tag cannot contain '</script '}, "script containing '</script ' throws";
-like exception { mk_elem 'script', '</script/' }, qr{tag cannot contain '</script/'}, "script containing '</script/' throws";
+like dies { mk_elem 'script', '</script ' }, qr{tag cannot contain '</script '}, "script containing '</script ' throws";
+like dies { mk_elem 'script', '</script/' }, qr{tag cannot contain '</script/'}, "script containing '</script/' throws";
 for my $torcher (
     [1, '<script>'],
     [1, '</script'],
@@ -79,7 +76,7 @@ for my $torcher (
     if ($good) {
         is to_html(mk_elem 'script', $fragment), "<script>$fragment</script>", "'<script>$fragment</script>' is valid";
     } else {
-        like exception { mk_elem 'script', $fragment }, qr/<script> tag cannot contain/, "'<script>$fragment</script>' throws";
+        like dies { mk_elem 'script', $fragment }, qr/<script> tag cannot contain/, "'<script>$fragment</script>' throws";
     }
 }
 
