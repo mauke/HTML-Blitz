@@ -642,6 +642,7 @@ method compile($name, $html) {
             }
 
         } else {
+            # uncoverable statement
             die "Internal error: unhandled token type '$token->{type}'";
         }
     }

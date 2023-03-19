@@ -398,6 +398,7 @@ method parse() {
         };
     }
 
+    # uncoverable statement
     die "Internal error: unparsable input '${\substr $$src_ref, pos($$src_ref), 10}'...";
 }
 
