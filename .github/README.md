@@ -93,7 +93,7 @@ call ["compile\_to\_file" in HTML::Blitz::Template](https://metacpan.org/pod/HTM
 3. Take care to recompile your templates as needed by rerunning steps 1 and 2 each
 time the source documents or processing rules change.
 4. In your application, load your template functions by `eval`'ing the code
-stored in step 2. In the case of files, you can simply use ["do EXPR" in perlfunc](https://metacpan.org/pod/perlfunc#do-EXPR).
+stored in step 2. In the case of files, you can simply use ["do EXPR" in perlfunc](https://perldoc.perl.org/perlfunc#do-EXPR).
 The return value will be a subroutine reference.
 5. Call your template functions as described in step 5 above.
 
@@ -230,7 +230,7 @@ first argument. The following keys are supported:
     Default: `qr/\A/`
 
     By default, HTML comments in template files are retained. This option accepts a
-    regex object (as created by [`qr//`](https://metacpan.org/pod/perlfunc#qr-STRING)), which is matched
+    regex object (as created by [`qr//`](https://perldoc.perl.org/perlfunc#qr-STRING)), which is matched
     against the contents of all HTML comments. Only those that match the regex are
     retained; all others are removed.
 
@@ -261,7 +261,7 @@ first argument. The following keys are supported:
     details for "Firstname Lastname"). To make sure all such instances are actually
     found and replaced by your processing rules, come up with a distinctive piece
     of marker text (e.g. _XXX_), include it in all of your dummy content, and pass
-    a regex object (as created by [`qr//`](https://metacpan.org/pod/perlfunc#qr-STRING)) that detects
+    a regex object (as created by [`qr//`](https://perldoc.perl.org/perlfunc#qr-STRING)) that detects
     it. For example:
 
     ```perl

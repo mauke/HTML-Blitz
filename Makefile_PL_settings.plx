@@ -28,9 +28,8 @@ return {
         'List::Util'           => '1.33',
         'Scalar::Util'         => 0,
     },
-    DEVELOP_REQUIRES   => {
-        'Test::Pod' => 1.22,
-    },
 
-    REPOSITORY         => [ github => 'mauke' ],
+    REPOSITORY => [ github => 'mauke' ],
+
+    HARNESS_OPTIONS => ['j4'],
 };
