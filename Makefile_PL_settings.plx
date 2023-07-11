@@ -4,7 +4,7 @@ use warnings;
 return {
     NAME               => 'HTML::Blitz',
     AUTHOR             => q{Lukas Mai <l.mai@web.de>},
-    LICENSE            => 'agpl_3',
+    LICENSE            => 'gpl_3',
 
     MIN_PERL_VERSION   => '5.24.0',
     CONFIGURE_REQUIRES => {},
