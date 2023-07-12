@@ -26,7 +26,7 @@ use constant {
     MAX_NESTED_CONCAT => 100,
 };
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 method new($class: :$_scope = 0, :$name = undef) {
     bless {
