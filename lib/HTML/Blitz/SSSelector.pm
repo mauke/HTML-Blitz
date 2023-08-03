@@ -18,7 +18,7 @@ use HTML::Blitz::SelectorType qw(
     ST_NTH_CHILD_OF_TYPE
 );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 method new($class: :$simple_selectors, :$link_type) {
     bless {

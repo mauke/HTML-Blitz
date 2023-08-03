@@ -6,7 +6,7 @@ package HTML::Blitz::Atom;
 use HTML::Blitz::pragma;
 use constant ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 method import($class: @names) {
     @_ = (
