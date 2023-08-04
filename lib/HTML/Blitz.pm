@@ -920,7 +920,7 @@ And these rules:
 =for highlighter language=perl
 
     [ 'div' => ['replace_inner_text', 'A'], ['replace_inner_text', 'B'] ],
-    [ '.foo' => ['replace_inner_text', 'B'] ],
+    [ '.foo' => ['replace_inner_text', 'C'] ],
 
 All three actions will run and replace the contents of the C<div> element, but
 since their order is unspecified, you may end up with any of the following
