@@ -621,7 +621,7 @@ method assemble(:$data_format, :$data_format_mapping) {
     )
     . "    my \$r = '';\n"
     . "\n"
-    . $gen_code =~ s/^/    /mgr
+    . $gen_code =~ s/^(?=.)/    /mgr
     . "    \$r\n"
     . "}\n"
 }
