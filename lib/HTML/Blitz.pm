@@ -1309,7 +1309,7 @@ attribute, and C<:not(*)> matches nothing.
 Other selectors or pseudo-classes are not currently implemented.
 
 In the following section, a I<variable name> refers to a string that starts
-with a letter or C<_>) (underscore), followed by 0 or more letters, C<_>,
+with a letter or C<_> (underscore), followed by 0 or more letters, C<_>,
 digits, C<.>, or C<->. Template variables identify sections that are filled in
 later when the template is expanded (at runtime, so to speak).
 

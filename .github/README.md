@@ -525,7 +525,7 @@ A simple selector is one of the following:
 Other selectors or pseudo-classes are not currently implemented.
 
 In the following section, a _variable name_ refers to a string that starts
-with a letter or `_`) (underscore), followed by 0 or more letters, `_`,
+with a letter or `_` (underscore), followed by 0 or more letters, `_`,
 digits, `.`, or `-`. Template variables identify sections that are filled in
 later when the template is expanded (at runtime, so to speak).
 
